@@ -23,7 +23,7 @@ In summary, Base58 is a crucial part of Bitcoin's user experience, helping make 
 
 
 
-
+===========================================================================================================================================================================================
 
 The error "Invalid hexadecimal key: 000000000000000000000000000000000000000000000000000000000000000G" occurs because hexadecimal (base 16) only includes the characters `0-9` and `A-F` (or `a-f`). The character `G` is not valid in hexadecimal, leading to the error.
 
