@@ -1,4 +1,5 @@
-### Base58
+###Base58 
+
 Base58 is a binary-to-text encoding scheme used in Bitcoin and other cryptocurrencies to represent large integers in a more human-readable format. It is an improvement over Base64 because it avoids confusing characters and symbols that can be mistaken for each other in certain fonts or contexts. Here’s a breakdown of its characteristics and why it's used in Bitcoin:
 
 ### Characteristics of Base58:
