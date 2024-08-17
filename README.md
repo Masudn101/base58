@@ -109,3 +109,92 @@ else:
 ### Custom Handling Logic
 
 If you have a different or more complex rule for handling `G`, please let me know, and I can adjust the implementation accordingly. This approach should work well if `G` needs to be handled in a specific way.
+
+
+
+
+
+
+
+
+==============>
+
+
+
+To modify the script so that it accepts and processes non-hexadecimal characters (`0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz`), we'll need to:
+
+1. **Update the validation function** to accept this expanded set of characters.
+2. **Adjust the processing functions** to handle the custom encoding appropriately.
+
+### Step 1: Modify the Validation Function
+
+We need to adjust the `is_valid_hex_key` function to allow the specified characters:
+
+```python
+def is_valid_custom_key(custom_key):
+    """
+    Validate if the given string contains only valid characters
+    (0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz).
+    """
+    valid_chars = set('0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz')
+    return all(char in valid_chars for char in custom_key)
+```
+
+### Step 2: Adjust the Conversion Functions
+
+Since the input string can now contain non-hexadecimal characters, the conversion logic will need to handle them accordingly. However, if your `convert_hex_to_wif` function expects a hexadecimal string, you'll need to preprocess the input. 
+
+For this example, I'll assume that each valid character corresponds to a particular value or is directly processed by `convert_hex_to_wif`. If this is not the case, please provide more details about how these characters should be handled.
+
+### Step 3: Update the Processing Logic
+
+Here’s how you could integrate the custom key validation and processing into the existing code:
+
+```python
+def convert_compressed_custom(custom_private_key):
+    """
+    Convert a custom key to Wallet Import Format (WIF) for compressed addresses.
+    """
+    wif = convert_hex_to_wif(custom_private_key, compressed=True)
+    with open('compressed_output.txt', 'a', encoding='utf-8') as file:
+        file.write(f"{wif}\n")
+
+def convert_uncompressed_custom(custom_private_key):
+    """
+    Convert a custom key to Wallet Import Format (WIF) for uncompressed addresses.
+    """
+    wif = convert_hex_to_wif(custom_private_key, compressed=False)
+    with open('uncompressed_output.txt', 'a', encoding='utf-8') as file:
+        file.write(f"{wif}\n")
+
+def process_custom_conversions(custom_private_key):
+    """
+    Process both compressed and uncompressed WIF conversions for a given custom private key.
+
+    Args:
+        custom_private_key (str): The custom private key to be converted.
+    """
+    if is_valid_custom_key(custom_private_key):
+        convert_compressed_custom(custom_private_key)
+        convert_uncompressed_custom(custom_private_key)
+    else:
+        print(f"Invalid custom key: {custom_private_key}")
+
+# Call process_file to handle the custom keys
+process_file("custom_input.txt", process_custom_conversions)
+
+print("Conversion process completed. Check 'compressed_output.txt' and "
+      "'uncompressed_output.txt' files for the converted keys.")
+```
+
+### Summary:
+
+- **`is_valid_custom_key`**: Validates that the input string contains only allowed characters.
+- **`convert_compressed_custom`** and **`convert_uncompressed_custom`**: Handle the conversion to WIF using the custom key.
+- **`process_custom_conversions`**: Ensures that both compressed and uncompressed conversions are performed on valid keys.
+
+### Integration:
+
+Replace the existing functions in your script with the updated ones to support the extended character set. This approach assumes that the `convert_hex_to_wif` function can handle the custom encoding correctly.
+
+If you need further adjustments or more detailed custom processing (like mapping each character to specific values), please let me know!
