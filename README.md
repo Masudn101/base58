@@ -39,3 +39,73 @@ The error "Invalid hexadecimal key: 00000000000000000000000000000000000000000000
 - **Check the Source**: If this key was generated or copied from somewhere, double-check the source for accuracy.
 
 Correcting the key to remove the `G` should resolve the error.
+
+
+
+>>>>>>>>>>>>>>.
+
+To implement custom handling for the string `000000000000000000000000000000000000000000000000000000000000000G`, we'll need to modify the code to:
+
+1. **Customize the Validation**: Update the `is_valid_hex_key` function to accept non-hexadecimal characters like `G`.
+2. **Handle Non-Standard Characters**: Define how these characters should be interpreted or converted during the process.
+
+### Step 1: Modify the Validation Function
+
+Here's an updated version of `is_valid_hex_key` that will accept the character `G`:
+
+```python
+def is_valid_custom_key(custom_key):
+    """
+    Validate if the given string is a valid custom key.
+    The custom key may include 'G' in addition to standard hexadecimal characters.
+    """
+    valid_chars = set('0123456789abcdefABCDEF')  # Standard hex characters
+    valid_chars.add('G')  # Custom character to be accepted
+
+    return all(char in valid_chars for char in custom_key)
+```
+
+### Step 2: Handling Non-Standard Characters
+
+You might need a way to handle or interpret the `G` character. Here are a few options:
+
+- **Replace `G` with a Specific Hex Value**: For example, you could replace `G` with `A` (or any other valid hex character) before processing.
+  
+- **Ignore `G`**: Simply strip out the `G` and continue processing the rest of the string.
+
+- **Custom Encoding**: Treat `G` as representing a specific value during encoding.
+
+Here’s how you could replace `G` with `A`:
+
+```python
+def preprocess_custom_key(custom_key):
+    """
+    Preprocess the custom key by replacing 'G' with 'A'.
+    """
+    return custom_key.replace('G', 'A')  # Replace 'G' with 'A'
+```
+
+### Step 3: Integration and Conversion
+
+Now, integrate these steps into your conversion process:
+
+```python
+hex_key = "000000000000000000000000000000000000000000000000000000000000000G"
+
+if is_valid_custom_key(hex_key):
+    processed_key = preprocess_custom_key(hex_key)
+    base58_key = base58_encode(processed_key)
+    print(f"Base58 Key: {base58_key}")
+else:
+    print("Invalid custom key.")
+```
+
+### Explanation:
+
+1. **Validation**: `is_valid_custom_key` will check if the key contains only valid characters (0-9, A-F, and G).
+2. **Preprocessing**: If `G` is found, it's replaced with `A` in `preprocess_custom_key`. This is just an example; you can choose any replacement or interpretation.
+3. **Conversion**: The processed key is then converted to Base58.
+
+### Custom Handling Logic
+
+If you have a different or more complex rule for handling `G`, please let me know, and I can adjust the implementation accordingly. This approach should work well if `G` needs to be handled in a specific way.
