@@ -199,3 +199,88 @@ print("Conversion process completed. Check 'compressed_output.txt' and "
 Replace the existing functions in your script with the updated ones to support the extended character set. This approach assumes that the `convert_hex_to_wif` function can handle the custom encoding correctly.
 
 If you need further adjustments or more detailed custom processing (like mapping each character to specific values), please let me know!
+
+
+
+
+
+==========================>
+
+
+Yes, it is possible to convert a non-hexadecimal character private key to WIF format, but you'll need to first decide on a method to map your non-hexadecimal characters to a hexadecimal or byte format that can be processed. Here's a general approach:
+
+### Steps to Achieve This:
+1. **Map Non-Hex Characters to Hex Values**: You need to define a custom mapping between your non-hexadecimal characters and hexadecimal values (e.g., A -> 00, B -> 01, etc.).
+2. **Convert Mapped Values to Bytes**: After mapping, convert the resulting hexadecimal string to bytes.
+3. **Proceed with WIF Conversion**: Use the standard method to convert the resulting bytes to the WIF format.
+
+### Example Script:
+
+Below is an example script that shows how you can achieve this. You'll need to customize the `custom_mapping` dictionary to fit your specific non-hexadecimal characters.
+
+```python
+import hashlib
+
+def base58_encode(b):
+    base58_alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+    count = 0
+    for byte in b:
+        if byte == 0:
+            count += 1
+        else:
+            break
+    num = int.from_bytes(b, 'big')
+    enc = ''
+    while num > 0:
+        num, mod = divmod(num, 58)
+        enc = base58_alphabet[mod] + enc
+    return '1' * count + enc
+
+def custom_to_hex(custom_key):
+    # Define your custom mapping from non-hex characters to hex values
+    custom_mapping = {
+        'A': '00', 'B': '01', 'C': '02', 'D': '03',
+        'E': '04', 'F': '05', 'G': '06', 'H': '07',
+        'I': '08', 'J': '09', 'K': '0A', 'L': '0B',
+        'M': '0C', 'N': '0D', 'O': '0E', 'P': '0F',
+        # Add more mappings as needed
+    }
+    
+    hex_key = ''.join(custom_mapping[char] for char in custom_key)
+    return hex_key
+
+def custom_private_key_to_wif(custom_key, compressed=True, testnet=False):
+    private_key_hex = custom_to_hex(custom_key)
+    private_key_bytes = bytes.fromhex(private_key_hex)
+
+    if compressed:
+        private_key_bytes += b'\x01'
+
+    prefix = b'\x80' if not testnet else b'\xef'
+    extended_key = prefix + private_key_bytes
+
+    first_sha256 = hashlib.sha256(extended_key).digest()
+    second_sha256 = hashlib.sha256(first_sha256).digest()
+
+    checksum = second_sha256[:4]
+    final_key = extended_key + checksum
+
+    wif = base58_encode(final_key)
+    return wif
+
+# Example usage:
+custom_key = 'ABCDEF'  # Your custom non-hexadecimal private key
+wif = custom_private_key_to_wif(custom_key)
+print("WIF: ", wif)
+```
+
+### Key Points:
+- **Custom Mapping (`custom_mapping`)**: The dictionary `custom_mapping` needs to be fully defined to map all characters in your private key. Ensure there is a unique hex value for each non-hex character.
+- **Processing**: The `custom_to_hex()` function converts the custom private key into a hexadecimal string based on your mapping.
+- **WIF Conversion**: The rest of the script follows the standard method for converting a hexadecimal private key to WIF format.
+
+### Considerations:
+- **Security**: Ensure that your custom mapping is secure and consistent. Inconsistent or insecure mappings could lead to vulnerabilities.
+- **Mapping Collisions**: Avoid any collisions in your mapping where two different characters map to the same hex value.
+
+This script can be adjusted based on your specific needs and the characters you are working with.
